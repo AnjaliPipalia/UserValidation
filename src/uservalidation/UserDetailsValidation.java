@@ -1,6 +1,7 @@
 package uservalidation;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
+import java.text.DecimalFormat;
 
 /**
  * This is UserDetailsValidation class for validating user details
@@ -122,11 +123,17 @@ public class UserDetailsValidation extends javax.swing.JFrame {
         } else if (isSalesInvalid()) {
             txtSales.requestFocusInWindow();
         } else {
-            String name = txtName.getText().trim();
-            String age = txtAge.getText().trim();
-            String sales = txtSales.getText().trim();
-            String msg = "Name: " + name + "\nAge: " + age + "\nSales: $" + sales;
-            JOptionPane.showMessageDialog(null, msg, "Validator Test", JOptionPane.INFORMATION_MESSAGE);
+            StringBuilder sb = new StringBuilder();
+            sb.append("Name: ");
+            sb.append(txtName.getText().trim());
+            sb.append("\n");
+            sb.append("Age: ");
+            sb.append(txtAge.getText().trim());
+            sb.append("\n");
+            sb.append("Sales: $");
+            sb.append(new DecimalFormat("#,###.00").format(new Double(txtSales.getText().trim())));
+            JOptionPane.showMessageDialog(null, sb.toString(), "Validator Test", JOptionPane.INFORMATION_MESSAGE);
+
             txtName.setText("");
             txtAge.setText("");
             txtSales.setText("");
@@ -138,19 +145,16 @@ public class UserDetailsValidation extends javax.swing.JFrame {
     private boolean isSalesInvalid() {
         String sales = txtSales.getText().trim();
         if (sales.matches("[0]+\\d")) {
-            sales = sales.replaceAll("[0]+", "");
-            txtSales.setText(sales);
+            txtSales.setText(sales.replaceAll("[0]+", ""));
         }
 
-        if (sales.isEmpty()) {
-            sales = "0";
-            txtSales.setText("0");
-        }
-
-        try {
-            Double.parseDouble(sales);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Sales does not appear to be a valid number.", "Invalid Entry", JOptionPane.ERROR_MESSAGE);
+        if (SwingValidator.isNotEmpty(txtSales, "")) {
+            if (!SwingValidator.isDouble(txtSales, "")) {
+                JOptionPane.showMessageDialog(null, "Sales does not appear to be a valid number.", "Invalid Entry", JOptionPane.ERROR_MESSAGE);
+                return true;
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Sales is a required field.", "Invalid Entry", JOptionPane.ERROR_MESSAGE);
             return true;
         }
         return false;
@@ -160,19 +164,16 @@ public class UserDetailsValidation extends javax.swing.JFrame {
     private boolean isAgeInvalid() {
         String age = txtAge.getText().trim();
         if (age.matches("[0]+\\d")) {
-            age = age.replaceAll("[0]+", "");
-            txtAge.setText(age);
+            txtAge.setText(age.replaceAll("[0]+", ""));
         }
 
-        if (age.isEmpty() || age.equals("0")) {
-            JOptionPane.showMessageDialog(null, "Please check the User's age. It appears to be blank or 0.", "Invalid Entry", JOptionPane.ERROR_MESSAGE);
-            return true;
-        }
-
-        try {
-            Integer.parseInt(age);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Age can only be an Integer value.", "Invalid Entry", JOptionPane.ERROR_MESSAGE);
+        if (SwingValidator.isNotEmpty(txtAge, "")) {
+            if (!SwingValidator.isInteger(txtAge, "")) {
+                JOptionPane.showMessageDialog(null, "Age can only be an Integer value.", "Invalid Entry", JOptionPane.ERROR_MESSAGE);
+                return true;
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Age is a required field.", "Invalid Entry", JOptionPane.ERROR_MESSAGE);
             return true;
         }
         return false;
@@ -181,7 +182,7 @@ public class UserDetailsValidation extends javax.swing.JFrame {
     // Validating the Name Field
     private boolean isNameInvalid() {
         String name = txtName.getText().trim();
-        if (name.isEmpty()) {
+        if (!SwingValidator.isNotEmpty(txtName, "")) {
             JOptionPane.showMessageDialog(null, "Please check the User's name. It appears to be blank.", "Invalid Entry", JOptionPane.ERROR_MESSAGE);
             return true;
         }
@@ -242,4 +243,28 @@ public class UserDetailsValidation extends javax.swing.JFrame {
     private javax.swing.JTextField txtName;
     private javax.swing.JTextField txtSales;
     // End of variables declaration
+
+    private static class SwingValidator {
+        static boolean isNotEmpty(JTextField field, String fieldName){
+            return !field.getText().isEmpty();
+        }
+
+        static boolean isInteger(JTextField field, String fieldName){
+            try {
+                Integer.parseInt(field.getText().trim());
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
+        static boolean isDouble(JTextField field, String fieldName){
+            try {
+                Double.parseDouble(field.getText().trim());
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+    }
 }
