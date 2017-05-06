@@ -168,7 +168,11 @@ public class UserDetailsValidation extends javax.swing.JFrame {
         }
 
         if (SwingValidator.isNotEmpty(txtAge, "")) {
-            if (!SwingValidator.isInteger(txtAge, "")) {
+            if(txtAge.getText().trim().equals("0")){
+                 JOptionPane.showMessageDialog(null, "Age cannot be 0.", "Invalid Entry", JOptionPane.ERROR_MESSAGE);
+                return true;
+            }
+           else if (!SwingValidator.isInteger(txtAge, "")) {
                 JOptionPane.showMessageDialog(null, "Age can only be an Integer value.", "Invalid Entry", JOptionPane.ERROR_MESSAGE);
                 return true;
             }
@@ -183,7 +187,7 @@ public class UserDetailsValidation extends javax.swing.JFrame {
     private boolean isNameInvalid() {
         String name = txtName.getText().trim();
         if (!SwingValidator.isNotEmpty(txtName, "")) {
-            JOptionPane.showMessageDialog(null, "Please check the User's name. It appears to be blank.", "Invalid Entry", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Name is a required field.", "Invalid Entry", JOptionPane.ERROR_MESSAGE);
             return true;
         }
         char[] chars = name.toCharArray();
